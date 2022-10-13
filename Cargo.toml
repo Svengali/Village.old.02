@@ -1,0 +1,26 @@
+[package]
+name = "village"
+version = "1.0.5"
+authors = ["marcsh <marcsh@gmail.com>"]
+edition = "2021"
+rust-version = "1.62.1"
+resolver = "2"
+
+[profile.release]
+opt-level = 1
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = false
+panic = 'unwind'
+incremental = true
+codegen-units = 16
+rpath = false
+strip = "symbols"
+
+[dependencies]
+bevy = { path = "../bevy" }
+json = "0.12.4"
+rand = "0.8.5"
+
+
