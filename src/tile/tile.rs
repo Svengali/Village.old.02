@@ -9,15 +9,8 @@ use bevy::{
     sprite::Sprite,
 };
 
-/*
-use bevy_asset::Handle;
-use bevy_ecs::bundle::Bundle;
-use bevy_render::{
-    texture::{Image, DEFAULT_IMAGE_HANDLE},
-    view::{ComputedVisibility, Visibility},
-};
-use bevy_transform::components::{GlobalTransform, Transform};
-*/
+
+
 
 #[derive(Bundle, Clone)]
 pub struct TileBundle {
