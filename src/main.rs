@@ -1,15 +1,43 @@
+
 //! Renders an animated sprite by loading all animation frames from a single image (a sprite sheet)
 //! into a texture atlas, and changing the displayed image periodically.
 
 use bevy::{prelude::*, render::texture::ImageSettings};
 
+mod tile;
+use tile::tile::TileBundle;
+
+/*
+pub mod prelude {
+    #[doc(hidden)]
+    pub use crate::{
+        bundle::{TileBundle}
+    };
+}
+*/
+
+// Enum that will be used as a global state for the game
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum GameState {
+    Invalid,
+    Splash,
+    Menu,
+    Game,
+}
+
+
 fn main() {
-    App::new()
-        .insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
-        .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
-        .add_system(animate_sprite)
-        .run();
+    let mut app = App::new();
+ 
+    let tileTest = TileBundle {
+        ..Default::default()
+    };
+
+    app.insert_resource(ImageSettings::default_nearest()); // prevents blurry sprites
+    app.add_plugins(DefaultPlugins);
+    app.add_startup_system(setup);
+    app.add_system(animate_sprite);
+    app.run();
 }
 
 #[derive(Component, Deref, DerefMut)]
@@ -24,6 +52,7 @@ fn animate_sprite(
         &Handle<TextureAtlas>,
     )>,
 ) {
+    /*
     for (mut timer, mut sprite, texture_atlas_handle) in &mut query {
         timer.tick(time.delta());
         if timer.just_finished() {
@@ -31,7 +60,26 @@ fn animate_sprite(
             sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
         }
     }
+    */
 }
+
+
+fn draw_tilemap(
+    time: Res<Time>,
+    texture_atlases: Res<Assets<TextureAtlas>>,
+    //*
+    mut query: Query<(
+        &Sprite,
+        &Transform
+    )>
+    //*/
+) {
+
+
+
+}
+
+
 
 fn setup(
     mut commands: Commands,
