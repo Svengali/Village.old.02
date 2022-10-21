@@ -10,6 +10,7 @@ use bevy::{
     render::texture::ImageSettings,
     app::AppExit,
 };
+use bevy_egui::egui::Align2;
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 
@@ -56,7 +57,6 @@ fn main() {
     app.add_system(mouse_move_event);
     app.add_system(scroll_events);
     app.add_system(my_cursor_system);
-    app.add_system(ui_example);
 
     app.add_system(bevy::window::close_on_esc);
 
@@ -130,13 +130,13 @@ fn setup(
         .insert(AnimationTimer(Timer::from_seconds(1.0, true)));
     // */
 
+    //*
     let map = Map::new(
         commands,
         asset_server,
         texture_atlases,
     );
-
-
+    // */
 }
 
 
@@ -144,7 +144,9 @@ fn my_cursor_system(
     // need to get window dimensions
     wnds: Res<Windows>,
     // query to get camera transform
-    q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>
+    q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mut egui_context: ResMut<EguiContext>,
+    time: Res<Time>,
 ) {
     // get the camera info and transform
     // assuming there is exactly one main camera entity, so query::single() is OK
@@ -162,27 +164,41 @@ fn my_cursor_system(
         // get the size of the window
         let window_size = Vec2::new(wnd.width() as f32, wnd.height() as f32);
 
-        // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)
-        let ndc = (screen_pos / window_size) * 2.0 - Vec2::ONE;
+        let world_pos = fun_name(screen_pos, window_size, camera_transform, camera);
 
-        // matrix for undoing the projection and camera transform
-        let ndc_to_world = camera_transform.compute_matrix() * camera.projection_matrix().inverse();
+        egui::Window::new("my_cursor_system")
+            .anchor(Align2::LEFT_TOP, bevy_egui::egui::Vec2::new(10.0, 10.0))
+            .show(egui_context.ctx_mut(), |ui| {
 
-        // use it to convert ndc to world-space coordinates
-        let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
+            //let world_pos_str = ;
 
-        // reduce it to a 2D value
-        let world_pos: Vec2 = world_pos.truncate();
+            let delta = time.delta_seconds();
 
-        eprintln!("World coords: {}/{}", world_pos.x, world_pos.y);
+            ui.label( format!("{world_pos} {delta}") );
+        });
+
+        //eprintln!("World coords: {}/{}", world_pos.x, world_pos.y);
     }
+}
+
+fn fun_name(screen_pos: Vec2, window_size: Vec2, camera_transform: &GlobalTransform, camera: &Camera) -> Vec2 {
+    // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)
+    let ndc = (screen_pos / window_size) * 2.0 - Vec2::ONE;
+    // matrix for undoing the projection and camera transform
+    let ndc_to_world = camera_transform.compute_matrix() * camera.projection_matrix().inverse();
+    // use it to convert ndc to world-space coordinates
+    let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
+    // reduce it to a 2D value
+    let world_pos: Vec2 = world_pos.truncate();
+
+    world_pos
 }
 
 
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>, 
     mut exit: EventWriter<AppExit>,
-    mut query: Query<(
+    query: Query<(
     &mut AnimationTimer,
     &mut TextureAtlasSprite,
     &Handle<TextureAtlas>,
@@ -253,7 +269,7 @@ fn mouse_move_event(
     mut mouse: EventReader<MouseMotion>,
 ) {
     for ev in mouse.iter() {
-        eprintln!("Mouse Delta: {}/{}", ev.delta.x, ev.delta.y);
+        //eprintln!("Mouse Delta: {}/{}", ev.delta.x, ev.delta.y);
     }
 }
 
@@ -265,10 +281,10 @@ fn mouse_button_events(
     for ev in mousebtn_evr.iter() {
         match ev.state {
             ButtonState::Pressed => {
-                println!("Mouse button press: {:?}", ev.button);
+                //println!("Mouse button press: {:?}", ev.button);
             }
             ButtonState::Released => {
-                println!("Mouse button release: {:?}", ev.button);
+                //println!("Mouse button release: {:?}", ev.button);
             }
         }
     }
@@ -306,8 +322,3 @@ fn scroll_events(
     }
 }
 
-fn ui_example(mut egui_context: ResMut<EguiContext>) {
-    egui::Window::new("Hello").show(egui_context.ctx_mut(), |ui| {
-        ui.label("world");
-    });
-}

@@ -13,6 +13,24 @@ use bevy::{
 
 use rand::Rng;
 
+enum WorldTiles {
+    Invalid = 304,
+
+    LightDirtCenter = 112,
+    LightDirtSpecial= 175,
+
+    DarkDirtCenter = 115,
+    DarkDirtSpecial= 178,
+
+    GrassCenter = 118,
+    GrassSpecial=181,
+
+    WaterCenter = 394,
+    WaterSpecial= 454,
+
+
+
+}
 
 #[derive(Debug, Default)]
 pub struct Map {
@@ -39,7 +57,15 @@ impl Map {
 
         for x in 0..128 {
 
-            let index: usize = rng.gen_range(0..1024);
+            let which_land_type = rng.gen_range(0..5);
+
+            let index: usize = match which_land_type {
+                0 => WorldTiles::LightDirtCenter as usize,
+                1 => WorldTiles::DarkDirtCenter as usize,
+                2 => WorldTiles::GrassCenter as usize,
+                3 => WorldTiles::WaterCenter as usize,
+                _ => WorldTiles::Invalid as usize,
+            };
 
             let world_x = (x as f32) * 32.0;
 
