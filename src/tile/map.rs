@@ -35,15 +35,15 @@ impl Map {
 
 
     for y in 0..128 {
-        let worldY = (y as f32) * 32.0;
+        let world_y = (y as f32) * 32.0;
 
         for x in 0..128 {
 
             let index: usize = rng.gen_range(0..1024);
 
-            let worldX = (x as f32) * 32.0;
+            let world_x = (x as f32) * 32.0;
 
-            let pos = Transform::from_translation(Vec3::new(worldX, worldY, 1.0));
+            let pos = Transform::from_translation(Vec3::new(world_x, world_y, 1.0));
 
             let sprite = TextureAtlasSprite::new( index );
 

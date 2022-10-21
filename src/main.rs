@@ -2,11 +2,18 @@
 //! Renders an animated sprite by loading all animation frames from a single image (a sprite sheet)
 //! into a texture atlas, and changing the displayed image periodically.
 
+use bevy::input::mouse::{MouseButtonInput, MouseWheel, MouseScrollUnit, MouseMotion};
+use bevy::log::LogSettings;
+use bevy::render::camera::RenderTarget;
 use bevy::{
     prelude::*, 
     render::texture::ImageSettings,
     app::AppExit,
 };
+use bevy_egui::{egui, EguiContext, EguiPlugin};
+
+
+
 
 mod tile;
 use tile::tile::TileBundle;
@@ -34,19 +41,24 @@ enum GameState {
 fn main() {
     let mut app = App::new();
  
-    let tileTest = TileBundle {
+    let tile_test = TileBundle {
         ..Default::default()
     };
 
     app.insert_resource(ImageSettings::default_nearest()); // prevents blurry sprites
     app.add_plugins(DefaultPlugins);
+    app.add_plugin(EguiPlugin);
     app.add_system(keyboard_input_system);
     app.add_startup_system(setup);
     //app.add_system(animate_sprite);
     app.add_system(camera_movement);
+    app.add_system(mouse_button_events);
+    app.add_system(mouse_move_event);
+    app.add_system(scroll_events);
+    app.add_system(my_cursor_system);
+    app.add_system(ui_example);
 
     app.add_system(bevy::window::close_on_esc);
-
 
     app.run();
 }
@@ -79,7 +91,7 @@ fn draw_tilemap(
     time: Res<Time>,
     texture_atlases: Res<Assets<TextureAtlas>>,
     //*
-    mut query: Query<(
+    query: Query<(
         &Sprite,
         &Transform
     )>
@@ -91,13 +103,16 @@ fn draw_tilemap(
 }
 
 
+#[derive(Component)]
+struct MainCamera;
 
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn_bundle(Camera2dBundle::default())
+        .insert(MainCamera);
 
 
 
@@ -123,6 +138,46 @@ fn setup(
 
 
 }
+
+
+fn my_cursor_system(
+    // need to get window dimensions
+    wnds: Res<Windows>,
+    // query to get camera transform
+    q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>
+) {
+    // get the camera info and transform
+    // assuming there is exactly one main camera entity, so query::single() is OK
+    let (camera, camera_transform) = q_camera.single();
+
+    // get the window that the camera is displaying to (or the primary window)
+    let wnd = if let RenderTarget::Window(id) = camera.target {
+        wnds.get(id).unwrap()
+    } else {
+        wnds.get_primary().unwrap()
+    };
+
+    // check if the cursor is inside the window and get its position
+    if let Some(screen_pos) = wnd.cursor_position() {
+        // get the size of the window
+        let window_size = Vec2::new(wnd.width() as f32, wnd.height() as f32);
+
+        // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)
+        let ndc = (screen_pos / window_size) * 2.0 - Vec2::ONE;
+
+        // matrix for undoing the projection and camera transform
+        let ndc_to_world = camera_transform.compute_matrix() * camera.projection_matrix().inverse();
+
+        // use it to convert ndc to world-space coordinates
+        let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
+
+        // reduce it to a 2D value
+        let world_pos: Vec2 = world_pos.truncate();
+
+        eprintln!("World coords: {}/{}", world_pos.x, world_pos.y);
+    }
+}
+
 
 fn keyboard_input_system(
     keyboard_input: Res<Input<KeyCode>>, 
@@ -194,7 +249,65 @@ fn camera_movement(
     }
 }
 
+fn mouse_move_event( 
+    mut mouse: EventReader<MouseMotion>,
+) {
+    for ev in mouse.iter() {
+        eprintln!("Mouse Delta: {}/{}", ev.delta.x, ev.delta.y);
+    }
+}
 
-fn exit_system(mut exit: EventWriter<AppExit>) {
-    exit.send(AppExit);
+fn mouse_button_events(
+    mut mousebtn_evr: EventReader<MouseButtonInput>,
+) {
+    use bevy::input::ButtonState;
+
+    for ev in mousebtn_evr.iter() {
+        match ev.state {
+            ButtonState::Pressed => {
+                println!("Mouse button press: {:?}", ev.button);
+            }
+            ButtonState::Released => {
+                println!("Mouse button release: {:?}", ev.button);
+            }
+        }
+    }
+}
+
+fn scroll_events(
+    mut scroll_evr: EventReader<MouseWheel>,
+    mut query: Query<(&Camera, &mut Transform)>,
+) {
+
+    //let log_settings = LogSettings::new();
+    //let handle: Handle<Level> = asset_server.load("trees.json.level");
+
+
+    for (_, mut transform) in query.iter_mut() {
+        for ev in scroll_evr.iter() {
+            let mut scroll = 0.0;
+            match ev.unit {
+                MouseScrollUnit::Line => {
+                    //println!("Scroll (line units): vertical: {}, horizontal: {}", ev.y, ev.x);
+                    scroll = ev.y;
+
+                }
+                MouseScrollUnit::Pixel => {
+                    //println!("Scroll (pixel units): vertical: {}, horizontal: {}", ev.y, ev.x);
+                    scroll = ev.y * 10.0;
+                }
+            }
+
+            let scale = scroll * 1.0;
+            let old_scale = transform.scale.x;
+            let new_scale = (old_scale + scale).clamp( 1.0, 20.0 );
+            transform.scale = Vec3::splat( new_scale );
+        }
+    }
+}
+
+fn ui_example(mut egui_context: ResMut<EguiContext>) {
+    egui::Window::new("Hello").show(egui_context.ctx_mut(), |ui| {
+        ui.label("world");
+    });
 }
