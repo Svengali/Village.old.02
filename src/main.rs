@@ -3,11 +3,12 @@
 //! into a texture atlas, and changing the displayed image periodically.
 
 use bevy::input::mouse::{MouseButtonInput, MouseWheel, MouseScrollUnit, MouseMotion};
-use bevy::log::LogSettings;
+//use bevy::log::LogSettings;
 use bevy::render::camera::RenderTarget;
 use bevy::{
     prelude::*, 
-    render::texture::ImageSettings,
+    //render::texture::ImageSettings,
+    render::texture::ImageFormat,
     app::AppExit,
 };
 use bevy_egui::egui::Align2;
@@ -46,9 +47,9 @@ fn main() {
         ..Default::default()
     };
 
-    app.insert_resource(ImageSettings::default_nearest()); // prevents blurry sprites
+    //app.insert_resource(ImageSettings::default_nearest()); // prevents blurry sprites
     app.add_plugins(DefaultPlugins);
-    app.add_plugin(EguiPlugin);
+    //app.add_plugin(EguiPlugin);
     app.add_system(keyboard_input_system);
     app.add_startup_system(setup);
     //app.add_system(animate_sprite);
@@ -56,7 +57,7 @@ fn main() {
     app.add_system(mouse_button_events);
     app.add_system(mouse_move_event);
     app.add_system(scroll_events);
-    app.add_system(my_cursor_system);
+    //app.add_system(my_cursor_system);
 
     app.add_system(bevy::window::close_on_esc);
 
@@ -139,13 +140,13 @@ fn setup(
     // */
 }
 
-
+/*
 fn my_cursor_system(
     // need to get window dimensions
     wnds: Res<Windows>,
     // query to get camera transform
     q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    mut egui_context: ResMut<EguiContext>,
+    mut egui_context: EguiContext,
     time: Res<Time>,
 ) {
     // get the camera info and transform
@@ -180,6 +181,8 @@ fn my_cursor_system(
         //eprintln!("World coords: {}/{}", world_pos.x, world_pos.y);
     }
 }
+*/
+
 
 fn fun_name(screen_pos: Vec2, window_size: Vec2, camera_transform: &GlobalTransform, camera: &Camera) -> Vec2 {
     // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)

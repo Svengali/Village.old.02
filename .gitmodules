@@ -1,0 +1,6 @@
+[submodule "libs/bevy"]
+	path = libs/bevy
+	url = git@github.com:bevyengine/bevy.git
+[submodule "libs/bevy_egui"]
+	path = libs/bevy_egui
+	url = git@github.com:Svengali/bevy_egui.git

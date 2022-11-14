@@ -44,7 +44,12 @@ impl Map {
         mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) -> Map {
     let texture_handle = asset_server.load("textures/world/base_out_atlas.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 32, 32);
+    let texture_atlas = TextureAtlas::from_grid(
+        texture_handle, 
+        Vec2::new(32.0, 32.0), 
+        32, 32,
+        Some(Vec2::splat(0.0)), Some(Vec2::splat(0.0))
+    );
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     let tile_guids: Vec<u32> = Vec::new();

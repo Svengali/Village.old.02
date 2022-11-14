@@ -1,6 +1,6 @@
 [package]
 name = "village"
-version = "1.0.5"
+version = "0.0.1"
 authors = ["marcsh <marcsh@gmail.com>"]
 edition = "2021"
 rust-version = "1.62.1"
@@ -19,9 +19,9 @@ rpath = false
 strip = "symbols"
 
 [dependencies]
-bevy = { path = "../bevy" }
-bevy_sprite = { path = "../bevy/crates/bevy_sprite" }
+bevy = { path = "libs/bevy" }
+bevy_sprite = { path = "libs/bevy/crates/bevy_sprite" }
 json = "0.12.4"
 rand = "0.8.5"
 bevy_common_assets = { git = "https://github.com/Svengali/bevy_common_assets.git" }
-bevy_egui = { path = "../bevy_egui" }
+bevy_egui = { path = "libs/bevy_egui" }
