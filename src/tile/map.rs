@@ -57,10 +57,10 @@ impl Map {
     let mut rng = rand::thread_rng();
 
 
-    for y in 0..128 {
+    for y in 0..256 {
         let world_y = (y as f32) * 32.0;
 
-        for x in 0..128 {
+        for x in 0..256 {
 
             let which_land_type = rng.gen_range(0..5);
 
@@ -78,7 +78,11 @@ impl Map {
 
             let sprite = TextureAtlasSprite::new( index );
 
+            /*
+            commands.spawn_batch()
+            // */
 
+            //*
             commands
                 .spawn_bundle(SpriteSheetBundle {
                     sprite: sprite,
@@ -86,6 +90,7 @@ impl Map {
                     transform: pos,
                     ..default()
                 });
+            // */
         }
     }
 

@@ -4,3 +4,6 @@
 [submodule "libs/bevy_egui"]
 	path = libs/bevy_egui
 	url = git@github.com:Svengali/bevy_egui.git
+[submodule "libs/rust-crdt"]
+	path = libs/rust-crdt
+	url = git@github.com:Svengali/rust-crdt.git

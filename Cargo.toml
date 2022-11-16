@@ -25,3 +25,6 @@ json = "0.12.4"
 rand = "0.8.5"
 bevy_common_assets = { git = "https://github.com/Svengali/bevy_common_assets.git" }
 bevy_egui = { path = "libs/bevy_egui" }
+crdts = { path = "libs/rust-crdt" }
+
+
