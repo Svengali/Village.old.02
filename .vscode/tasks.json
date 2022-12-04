@@ -7,8 +7,19 @@
 			"problemMatcher": [
 				"$rustc"
 			],
-			"group": "build",
-			"label": "cargo build"
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "build debug"
+		},
+		{
+			"type": "shell",
+			"command": "cargo build --release",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"label": "build release"
 		}
 	]
 }

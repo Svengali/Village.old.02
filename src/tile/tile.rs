@@ -1,10 +1,7 @@
 
 
 use bevy::{
-    prelude::{
-        default, Bundle, Component, ComputedVisibility, Entity, GlobalTransform, Handle, Image,
-        Transform, Visibility,
-    },
+    prelude::{*},
     render::texture::DEFAULT_IMAGE_HANDLE,
     sprite::Sprite,
 };

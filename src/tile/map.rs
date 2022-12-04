@@ -2,14 +2,10 @@
 
 
 use bevy::{
-    prelude::{
-        default, Bundle, Component, ComputedVisibility, Entity, GlobalTransform, Handle, Image,
-        Transform, Visibility, Commands, SpriteSheetBundle, Res, AssetServer, ResMut, Assets,
-        TextureAtlas, Vec2, Vec3, TextureAtlasSprite
-    },
-    render::texture::DEFAULT_IMAGE_HANDLE,
-    sprite::Sprite,
+    prelude::{*},
 };
+
+use crate::fixed::StaticSpriteSheetBundle;
 
 use rand::Rng;
 
@@ -17,16 +13,16 @@ enum WorldTiles {
     Invalid = 304,
 
     LightDirtCenter = 112,
-    LightDirtSpecial= 175,
+    //LightDirtSpecial= 175,
 
     DarkDirtCenter = 115,
-    DarkDirtSpecial= 178,
+    //DarkDirtSpecial= 178,
 
     GrassCenter = 118,
-    GrassSpecial=181,
+    //GrassSpecial=181,
 
     WaterCenter = 394,
-    WaterSpecial= 454,
+    //WaterSpecial= 454,
 
 
 
@@ -43,6 +39,7 @@ impl Map {
         asset_server: Res<AssetServer>,
         mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) -> Map {
+
     let texture_handle = asset_server.load("textures/world/base_out_atlas.png");
     let texture_atlas = TextureAtlas::from_grid(
         texture_handle, 
@@ -56,7 +53,7 @@ impl Map {
 
     let mut rng = rand::thread_rng();
 
-    let size = 2048;
+    let size = 512;
 
     for y in 0..size {
         let world_y = (y as f32) * 32.0;
@@ -75,7 +72,7 @@ impl Map {
 
             let world_x = (x as f32) * 32.0;
 
-            let pos = Transform::from_translation(Vec3::new(world_x, world_y, 1.0));
+            let pos = GlobalTransform::from_translation(Vec3::new(world_x, world_y, 1.0));
 
             let sprite = TextureAtlasSprite::new( index );
 
@@ -84,11 +81,12 @@ impl Map {
             // */
 
             //*
+
             commands
-                .spawn_bundle(SpriteSheetBundle {
+                .spawn(StaticSpriteSheetBundle {
                     sprite: sprite,
                     texture_atlas: texture_atlas_handle.clone(),
-                    transform: pos,
+                    global_transform: pos,
                     ..default()
                 });
             // */
@@ -100,6 +98,8 @@ impl Map {
         ..Default::default()
     }
     }
+
+    
 }
 
 
