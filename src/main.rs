@@ -112,7 +112,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    commands.spawn_bundle(Camera2dBundle::default())
+    commands.spawn(Camera2dBundle::default())
         .insert(MainCamera);
 
 

@@ -56,11 +56,12 @@ impl Map {
 
     let mut rng = rand::thread_rng();
 
+    let size = 2048;
 
-    for y in 0..256 {
+    for y in 0..size {
         let world_y = (y as f32) * 32.0;
 
-        for x in 0..256 {
+        for x in 0..size {
 
             let which_land_type = rng.gen_range(0..5);
 
